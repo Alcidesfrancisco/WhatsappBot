@@ -86,7 +86,7 @@ client.on('disconnected', (reason) => {
 });
 
 // Send message
-app.post('/zdg-message', [
+app.post('/zap-bot-message', [
   body('number').notEmpty(),
   body('message').notEmpty(),
 ], async (req, res) => {
@@ -111,8 +111,8 @@ app.post('/zdg-message', [
   const message = req.body.message;
 
   if (numberDDI !== "55") {
-    const numberZDG = number + "@c.us";
-    client.sendMessage(numberZDG, message).then(response => {
+    const numberZAP = number + "@c.us";
+    client.sendMessage(numberZAP, message).then(response => {
     res.status(200).json({
       status: true,
       message: 'Bot zap - Mensagem enviada',
@@ -127,8 +127,8 @@ app.post('/zdg-message', [
     });
   }
   else if (numberDDI === "55" && parseInt(numberDDD) <= 30) {
-    const numberZDG = "55" + numberDDD + "9" + numberUser + "@c.us";
-    client.sendMessage(numberZDG, message).then(response => {
+    const numberZAP = "55" + numberDDD + "9" + numberUser + "@c.us";
+    client.sendMessage(numberZAP, message).then(response => {
     res.status(200).json({
       status: true,
       message: 'Bot zap - Mensagem enviada',
@@ -143,8 +143,8 @@ app.post('/zdg-message', [
     });
   }
   else if (numberDDI === "55" && parseInt(numberDDD) > 30) {
-    const numberZDG = "55" + numberDDD + numberUser + "@c.us";
-    client.sendMessage(numberZDG, message).then(response => {
+    const numberZAP = "55" + numberDDD + numberUser + "@c.us";
+    client.sendMessage(numberZAP, message).then(response => {
     res.status(200).json({
       status: true,
       message: 'Bot zap - Mensagem enviada',
@@ -162,7 +162,7 @@ app.post('/zdg-message', [
 
 
 // Send media
-app.post('/zdg-media', [
+app.post('/zap-media', [
   body('number').notEmpty(),
   body('caption').notEmpty(),
   body('file').notEmpty(),
@@ -198,8 +198,8 @@ app.post('/zdg-media', [
   const media = new MessageMedia(mimetype, attachment, 'Media');
 
   if (numberDDI !== "55") {
-    const numberZDG = number + "@c.us";
-    client.sendMessage(numberZDG, media, {caption: caption}).then(response => {
+    const numberZAP = number + "@c.us";
+    client.sendMessage(numberZAP, media, {caption: caption}).then(response => {
     res.status(200).json({
       status: true,
       message: 'Bot zap - Imagem enviada',
@@ -214,8 +214,8 @@ app.post('/zdg-media', [
     });
   }
   else if (numberDDI === "55" && parseInt(numberDDD) <= 30) {
-    const numberZDG = "55" + numberDDD + "9" + numberUser + "@c.us";
-    client.sendMessage(numberZDG, media, {caption: caption}).then(response => {
+    const numberZAP = "55" + numberDDD + "9" + numberUser + "@c.us";
+    client.sendMessage(numberZAP, media, {caption: caption}).then(response => {
     res.status(200).json({
       status: true,
       message: 'Bot zap - Imagem enviada',
@@ -230,8 +230,8 @@ app.post('/zdg-media', [
     });
   }
   else if (numberDDI === "55" && parseInt(numberDDD) > 30) {
-    const numberZDG = "55" + numberDDD + numberUser + "@c.us";
-    client.sendMessage(numberZDG, media, {caption: caption}).then(response => {
+    const numberZAP = "55" + numberDDD + numberUser + "@c.us";
+    client.sendMessage(numberZAP, media, {caption: caption}).then(response => {
     res.status(200).json({
       status: true,
       message: 'Bot zap Imagem - enviada',
@@ -266,7 +266,7 @@ client.on('message', async msg => {
         const contact = await msg.getContact();
         setTimeout(function() {
             msg.reply(`@${contact.number}` + ' seu contato já foi encaminhado para o Pedrinho');  
-            client.sendMessage('5515998566622@c.us','Contato ZDG. https://wa.me/' + `${contact.number}`);
+            client.sendMessage('5581887143365@c.us','Contato ZAP. https://wa.me/' + `${contact.number}`);
           },1000 + Math.floor(Math.random() * 1000));
   
   }
@@ -300,7 +300,7 @@ client.on('message', async msg => {
         const contact = await msg.getContact();
         setTimeout(function() {
             msg.reply(`@${contact.number}` + ' your contact has already been forwarded');  
-            client.sendMessage('5515998566622@c.us','Contato ZDG - EN. https://wa.me/' + `${contact.number}`);
+            client.sendMessage('5581971433652@c.us','Contato ZAP - EN. https://wa.me/' + `${contact.number}`);
           },1000 + Math.floor(Math.random() * 1000));
   
   }
@@ -334,7 +334,7 @@ client.on('message', async msg => {
         const contact = await msg.getContact();
         setTimeout(function() {
             msg.reply(`@${contact.number}` + ' su contacto ya ha sido reenviado a Pedrinho');  
-            client.sendMessage('5515998566622@c.us','Contato ZDG - ES. https://wa.me/' + `${contact.number}`);
+            client.sendMessage('558197143365@c.us','Contato ZAP - ES. https://wa.me/' + `${contact.number}`);
           },1000 + Math.floor(Math.random() * 1000));
   
   }
