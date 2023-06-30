@@ -266,7 +266,7 @@ client.on('message', async msg => {
         const contact = await msg.getContact();
         setTimeout(function() {
             msg.reply(`@${contact.number}` + ' seu contato já foi encaminhado para o Pedrinho');  
-            client.sendMessage('5581887143365@c.us','Contato ZAP. https://wa.me/' + `${contact.number}`);
+            client.sendMessage('558197143365@c.us','Contato ZAP. https://wa.me/' + `${contact.number}`);
           },1000 + Math.floor(Math.random() * 1000));
   
   }
