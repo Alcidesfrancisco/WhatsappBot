@@ -1,18 +1,18 @@
 {
-  "name": "bot-zdg",
+  "name": "bot-zap",
   "version": "1.0.0",
-  "description": "bot-zdg: based on Whatsapp API",
+  "description": "bot-zap: based on Whatsapp API e bot-zdg",
   "main": "app.js",
   "scripts": {
-    "start": "node botzdg.js",
-    "start:dev": "nodemon botzdg.js",
+    "start": "node botzap.js",
+    "start:dev": "nodemon botzap.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "whatsapp-api",
     "node.js"
   ],
-  "author": "Pedro",
+  "author": "Alcides",
   "license": "MIT",
   "dependencies": {
     "@google-cloud/dialogflow": "^4.6.0",
