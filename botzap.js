@@ -52,7 +52,7 @@ client.on('qr', (qr) => {
     console.log('QR RECEIVED', qr);
     qrcode.toDataURL(qr, (err, url) => {
       socket.emit('qr', url);
-      socket.emit('message', 'Bot zap  - QRCode recebido, aponte a câmera  seu celular!');
+      socket.emit('message', 'Bot zap  - QRCode recebido, aponte a câmera  do seu celular!');
     });
 });
 
@@ -85,12 +85,14 @@ client.on('disconnected', (reason) => {
 });
 });
 
+var mensagens = [];
+
 // Send message
 app.post('/zap-bot-message', [
   body('number').notEmpty(),
   body('message').notEmpty(),
 ], async (req, res) => {
-  console.log("teste", req.body.number);
+  console.log("mensagem enviada para "  , req.body.number);
   const errors = validationResult(req).formatWith(({
     msg
   }) => {
@@ -103,12 +105,15 @@ app.post('/zap-bot-message', [
       message: errors.mapped()
     });
   }
-
+  
   const number = req.body.number;
   const numberDDI = number.substr(0, 2);
   const numberDDD = number.substr(2, 2);
   const numberUser = number.substr(-8, 8);
   const message = req.body.message;
+
+
+  //mensagens.push(new Mensagem().compor_mensagem(req.body.message));
 
   if (numberDDI !== "55") {
     const numberZAP = number + "@c.us";
@@ -159,7 +164,6 @@ app.post('/zap-bot-message', [
     });
   }
 });
-
 
 // Send media
 app.post('/zap-media', [
@@ -249,8 +253,14 @@ app.post('/zap-media', [
 
 client.on('message', async msg => {
 
-  if (msg.body !== null && msg.body === "1") {
-    msg.reply("");
+  if (msg.body !== null && msg.body === "OK") {
+    msg.reply("Recebidido a confirmação de envio de suprimento para a impressora");
+    setTimeout(function() {
+      msg.reply(`@${contact.number}` + ' seu contato já foi encaminhado para o O NATI');  
+
+      client.sendMessage('558197143365@c.us','Contato ZAP. https://wa.me/' + `${contact.number}`);
+    },1000 + Math.floor(Math.random() * 1000));
+    
   } 
   
   else if (msg.body !== null && msg.body === "2") {
@@ -265,7 +275,7 @@ client.on('message', async msg => {
 
         const contact = await msg.getContact();
         setTimeout(function() {
-            msg.reply(`@${contact.number}` + ' seu contato já foi encaminhado para o Pedrinho');  
+            msg.reply(`@${contact.number}` + ' seu contato já foi encaminhado para o O NATI');  
             client.sendMessage('558197143365@c.us','Contato ZAP. https://wa.me/' + `${contact.number}`);
           },1000 + Math.floor(Math.random() * 1000));
   
@@ -304,37 +314,12 @@ client.on('message', async msg => {
           },1000 + Math.floor(Math.random() * 1000));
   
   }
-  
-  else if (msg.body !== null && msg.body === "11") {
-    msg.reply("");
-  }
-  
-  else if (msg.body !== null && msg.body === "12") {
-    msg.reply("");
-  }
-  
-  else if (msg.body !== null && msg.body === "14") {
-    msg.reply("");
-  }
-  
-  else if (msg.body !== null && msg.body === "15") {
-    msg.reply("");
-  } 
-  
-  else if (msg.body !== null && msg.body === "16") {
-    msg.reply("");
-  }
-  
-  else if (msg.body !== null && msg.body === "17") {
-    msg.reply("");
-  }
-  
   else if (msg.body !== null && msg.body === "18") {
 
         const contact = await msg.getContact();
         setTimeout(function() {
             msg.reply(`@${contact.number}` + ' su contacto ya ha sido reenviado a Pedrinho');  
-            client.sendMessage('558197143365@c.us','Contato ZAP - ES. https://wa.me/' + `${contact.number}`);
+            client.sendMessage('558197143365@c.us','Contato ZAP. https://wa.me/' + `${contact.number}`);
           },1000 + Math.floor(Math.random() * 1000));
   
   }
