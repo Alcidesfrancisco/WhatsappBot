@@ -1,16 +1,27 @@
-const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
-const express = require('express');
-const { body, validationResult } = require('express-validator');
-const socketIO = require('socket.io');
-const qrcode = require('qrcode');
-const http = require('http');
-const fileUpload = require('express-fileupload');
-const axios = require('axios');
-const mime = require('mime-types');
-const port = process.env.PORT || 8000;
+
+import web from 'whatsapp-web.js';
+const  { Client, LocalAuth, MessageMedia } = web;
+import express  from 'express';
+//const express = require('express');
+import  { body, validationResult }  from 'express-validator';
+import socketIO from 'socket.io';
+import qrcode from 'qrcode';
+import http from 'http';
+import fileUpload from 'express-fileupload';
+import axios from 'axios';
+import mime from 'mime-types';
+const port =  process.env.PORT || 8000;
 const app = express();
 const server = http.createServer(app);
-const io = socketIO(server);
+const io =  socketIO(server);
+
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+import {Mensagem} from './pojo/Mensagem.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.use(express.json());
 app.use(express.urlencoded({
@@ -112,8 +123,7 @@ app.post('/zap-bot-message', [
   const numberUser = number.substr(-8, 8);
   const message = req.body.message;
 
-
-  //mensagens.push(new Mensagem().compor_mensagem(req.body.message));
+  filtrar_mensagens(req);
 
   if (numberDDI !== "55") {
     const numberZAP = number + "@c.us";
@@ -252,15 +262,15 @@ app.post('/zap-media', [
 });
 
 client.on('message', async msg => {
-
-  if (msg.body !== null && msg.body === "OK") {
-    msg.reply("Recebidido a confirmação de envio de suprimento para a impressora");
+var retorno;
+  if (msg.body !== null && msg.body.toString().toUpperCase() === "OK") {
+    const contact = await msg.getContact();
+    msg.reply("Recebido a confirmação de envio de suprimento para a impressora");
     setTimeout(function() {
-      msg.reply(`@${contact.number}` + ' seu contato já foi encaminhado para o O NATI');  
-
-      client.sendMessage('558197143365@c.us','Contato ZAP. https://wa.me/' + `${contact.number}`);
+      retorno =  msg.reply(`${contact.pushname}` + ', Deseja informar data prevista para o envio do Suprimento de impressão?\n 1 - Sim  2 - Não');  
+      
     },1000 + Math.floor(Math.random() * 1000));
-    
+    console.log(retorno);
   } 
   
   else if (msg.body !== null && msg.body === "2") {
@@ -353,3 +363,39 @@ client.on('message', async msg => {
 server.listen(port, function() {
         console.log('App running on *: ' + port);
 });
+
+
+function filtrar_mensagens(req) {
+  var mensagem = new Mensagem().compor_mensagem(req.body.message);
+  var adicionou = false;
+  var repetido = false;
+  if (mensagens.length > 0) {
+
+    mensagens.forEach(element => {
+      if (mensagem.impressora.serial === element.impressora.serial) {
+        if (mensagem.comparar_mensagem(element)) {
+          mensagens.push(element); // serial igual e status diferente, adiciona
+          adicionou = true;
+          console.log("adicionou");
+        } else {
+          repetido = true;
+          console.log("repetido");
+        }
+
+      }
+    });
+    if (!repetido && !adicionou) {
+      mensagens.push(mensagem);
+      console.log("novo");
+    }
+  } else {
+    mensagens.push(mensagem);
+    adicionou = true;
+  }
+  var adicionou = false;
+  var repetido = false;
+
+  console.log(mensagens.length);
+  console.log(mensagens);
+}
+

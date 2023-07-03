@@ -10,3 +10,4 @@ class Impressora{
 
 
 }
+export {Impressora}

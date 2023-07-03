@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "bot-zap: based on Whatsapp API e bot-zdg",
   "main": "app.js",
+  "type": "module",
   "scripts": {
     "start": "node botzap.js",
     "start:dev": "nodemon botzap.js",
