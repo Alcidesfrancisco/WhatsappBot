@@ -13,7 +13,7 @@ class Mensagem{
     set_status(status){this.status = status};
 
     compor_mensagem(mensagem_zap){
-        
+        try{
         let linhas = mensagem_zap.split("\n");
         this.texto = linhas.shift();
 
@@ -27,6 +27,9 @@ class Mensagem{
         impressora.paginas = linhas.shift().split(' ')[2];
         this.impressora = impressora;
         this.status = "NAO_LIDA";
+        }catch(erro){
+            console.log(erro);
+        }
         return this;
     }
 

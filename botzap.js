@@ -98,6 +98,12 @@ client.on('disconnected', (reason) => {
 
 var mensagens = [];
 
+app.get('/zap-bot-get_messages', async (req, res) => {  
+
+  res.send(mensagens)
+  console.log('zap-bot-get XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
+})
+
 // Send message
 app.post('/zap-bot-message', [
   body('number').notEmpty(),
@@ -366,36 +372,47 @@ server.listen(port, function() {
 
 
 function filtrar_mensagens(req) {
-  var mensagem = new Mensagem().compor_mensagem(req.body.message);
-  var adicionou = false;
-  var repetido = false;
-  if (mensagens.length > 0) {
+  console.log('Filtrar');
+  console.log(req.headers);
+  console.log(req.headers['tipo_mensagem']);
+  let tipo_mensagem = req.headers['tipo_mensagem'];
 
-    mensagens.forEach(element => {
-      if (mensagem.impressora.serial === element.impressora.serial) {
-        if (mensagem.comparar_mensagem(element)) {
-          mensagens.push(element); // serial igual e status diferente, adiciona
-          adicionou = true;
-          console.log("adicionou");
-        } else {
-          repetido = true;
-          console.log("repetido");
+  //só passa se for mnsagem do tipo toner
+  if(tipo_mensagem === "toner"){
+    try{
+      var mensagem = new Mensagem().compor_mensagem(req.body.message);
+      var adicionou = false;
+      var repetido = false;
+      if (mensagens.length > 0) {
+
+        mensagens.forEach(element => {
+          if (mensagem.impressora.serial === element.impressora.serial) {
+            if (mensagem.comparar_mensagem(element)) {
+              mensagens.push(element); // serial igual e status diferente, adiciona
+              adicionou = true;
+              console.log("adicionou");
+            } else {
+              repetido = true;
+              console.log("repetido");
+            }
+
+          }
+        });
+        if (!repetido && !adicionou) {
+          mensagens.push(mensagem);
+          console.log("novo");
         }
-
+      } else {
+        mensagens.push(mensagem);
+        adicionou = true;
       }
-    });
-    if (!repetido && !adicionou) {
-      mensagens.push(mensagem);
-      console.log("novo");
+      var adicionou = false;
+      var repetido = false;
+    }catch(e){
+    console.log(e);
     }
-  } else {
-    mensagens.push(mensagem);
-    adicionou = true;
-  }
-  var adicionou = false;
-  var repetido = false;
-
-  console.log(mensagens.length);
-  console.log(mensagens);
+    console.log(mensagens.length);
+    console.log(mensagens);
+}
 }
 
