@@ -14,14 +14,18 @@ const port =  process.env.PORT || 8000;
 const app = express();
 const server = http.createServer(app);
 const io =  socketIO(server);
+import { Printer } from './model/Printer.js';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import {Mensagem} from './pojo/Mensagem.js';
+import {Mensagem} from './model/Mensagem.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// app.use(express.json({limit: '50mb'}));
+// app.use(express.urlencoded({limit: '50mb'}));
 
 app.use(express.json());
 app.use(express.urlencoded({
@@ -104,6 +108,12 @@ app.get('/zap-bot-get_messages', async (req, res) => {
   console.log('zap-bot-get XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
 })
 
+app.post('/zap-bot-printer', async (req, res) =>{
+//   var p = req.body["name"];
+// console.log(p);
+
+});
+
 // Send message
 app.post('/zap-bot-message', [
   body('number').notEmpty(),
@@ -130,6 +140,8 @@ app.post('/zap-bot-message', [
   const message = req.body.message;
 
   filtrar_mensagens(req);
+  //var p = Printer(message);
+  //console.log(message);
 
   if (numberDDI !== "55") {
     const numberZAP = number + "@c.us";
@@ -268,23 +280,28 @@ app.post('/zap-media', [
 });
 
 client.on('message', async msg => {
-var retorno;
+var respostas = [];
   if (msg.body !== null && msg.body.toString().toUpperCase() === "OK") {
+    respostas.push("OK");
+    for (let index = 0; index < mensagens.length; index++) {
+      mensagens[index].status = "LIDA";      
+    }
+    console.log(mensagens);
     const contact = await msg.getContact();
-    msg.reply("Recebido a confirmação de envio de suprimento para a impressora");
-    setTimeout(function() {
-      retorno =  msg.reply(`${contact.pushname}` + ', Deseja informar data prevista para o envio do Suprimento de impressão?\n 1 - Sim  2 - Não');  
-      
-    },1000 + Math.floor(Math.random() * 1000));
-    console.log(retorno);
+    msg.reply(`Recebido a confirmação de envio de suprimento para a impressora\n  ${contact.pushname} ", deseja informar data prevista para o envio do Suprimento de impressão?\n S-[Sim]  N-[Não]`);
+    
   } 
   
-  else if (msg.body !== null && msg.body === "2") {
-    msg.reply("");
+  else if (msg.body !== null && (msg.body.toString().toUpperCase() == "SIM" || msg.body.toString().toUpperCase() == "S")) {
+    
+    msg.reply("Informe a Data de prevista para envio do suprimento");
+    respostas = [];
+
   }
   
-  else if (msg.body !== null && msg.body === "3") {
-    msg.reply("");
+  else if (msg.body !== null && (msg.body.toString().toUpperCase() == "NÃO" || msg.body.toString().toUpperCase() == "N" || msg.body !== null && msg.body.toString().toUpperCase() === "NAO") && "OK" === respostas.at[-1]) {
+    msg.reply("Obrigado por atender nossas demandas! até a próxima!!");
+    respostas = [];
   }
   
   else if (msg.body !== null && msg.body === "4") {
@@ -361,7 +378,8 @@ var retorno;
 	}
 
 	else if (msg.body !== null || msg.body === "0" || msg.type !== 'ciphertext') {
-    //msg.reply("Testando umas paradas aqui ignore essas mensagens automáticas");
+    
+    msg.reply("opção inválida! XXXX" + msg.body);
 	}
 });
 

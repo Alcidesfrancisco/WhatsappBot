@@ -1,4 +1,4 @@
-import {Impressora} from './Impressora.js';
+import {Printer} from './Printer.js';
 class Mensagem{
     constructor(){
         this.texto = "";
@@ -17,11 +17,11 @@ class Mensagem{
         let linhas = mensagem_zap.split("\n");
         this.texto = linhas.shift();
 
-        var impressora = new Impressora();
+        var impressora = new Printer();
         impressora.marca = linhas.shift().split(' ')[1];
         impressora.modelo = linhas.shift().split(' ')[1];
         impressora.serial = linhas.shift().split(' ')[1];;
-        impressora.ip = linhas.shift().split(' ')[1];
+        impressora.url = linhas.shift().split(' ')[1];
         impressora.nivel_toner = linhas.shift().split(' ')[3];
         linhas.shift();
         impressora.paginas = linhas.shift().split(' ')[2];
