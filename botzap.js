@@ -109,9 +109,11 @@ app.get('/zap-bot-get_messages', async (req, res) => {
 })
 
 app.post('/zap-bot-printer', async (req, res) =>{
-//   var p = req.body["name"];
-// console.log(p);
-
+    var p = req.headers;
+   
+    console.log(p["tipo_mensagem"]);
+    res.send(p);
+   
 });
 
 // Send message
@@ -139,60 +141,66 @@ app.post('/zap-bot-message', [
   const numberUser = number.substr(-8, 8);
   const message = req.body.message;
 
-  filtrar_mensagens(req);
+  if (filtrar_mensagens(req)){
   //var p = Printer(message);
   //console.log(message);
 
-  if (numberDDI !== "55") {
-    const numberZAP = number + "@c.us";
-    client.sendMessage(numberZAP, message).then(response => {
-    res.status(200).json({
-      status: true,
-      message: 'Bot zap - Mensagem enviada',
-      response: response
-    });
-    }).catch(err => {
-    res.status(500).json({
-      status: false,
-      message: 'Bot zap - Mensagem não enviada',
-      response: err.text
-    });
-    });
-  }
-  else if (numberDDI === "55" && parseInt(numberDDD) <= 30) {
-    const numberZAP = "55" + numberDDD + "9" + numberUser + "@c.us";
-    client.sendMessage(numberZAP, message).then(response => {
-    res.status(200).json({
-      status: true,
-      message: 'Bot zap - Mensagem enviada',
-      response: response
-    });
-    }).catch(err => {
-    res.status(500).json({
-      status: false,
-      message: 'Bot zap - Mensagem não enviada',
-      response: err.text
-    });
-    });
-  }
-  else if (numberDDI === "55" && parseInt(numberDDD) > 30) {
-    const numberZAP = "55" + numberDDD + numberUser + "@c.us";
-    client.sendMessage(numberZAP, message).then(response => {
-    res.status(200).json({
-      status: true,
-      message: 'Bot zap - Mensagem enviada',
-      response: response
-    });
-    }).catch(err => {
-    res.status(500).json({
-      status: false,
-      message: 'Bot zap - Mensagem não enviada',
-      response: err.text
-    });
-    });
-  }
+    if (numberDDI !== "55") {
+      const numberZAP = number + "@c.us";
+      client.sendMessage(numberZAP, message).then(response => {
+      res.status(200).json({
+        status: true,
+        message: 'Bot zap - Mensagem enviada',
+        response: response
+      });
+      }).catch(err => {
+      res.status(500).json({
+        status: false,
+        message: 'Bot zap - Mensagem não enviada',
+        response: err.text
+      });
+      });
+    }
+    else if (numberDDI === "55" && parseInt(numberDDD) <= 30) {
+      const numberZAP = "55" + numberDDD + "9" + numberUser + "@c.us";
+      client.sendMessage(numberZAP, message).then(response => {
+      res.status(200).json({
+        status: true,
+        message: 'Bot zap - Mensagem enviada',
+        response: response
+      });
+      }).catch(err => {
+      res.status(500).json({
+        status: false,
+        message: 'Bot zap - Mensagem não enviada',
+        response: err.text
+      });
+      });
+    }
+    else if (numberDDI === "55" && parseInt(numberDDD) > 30) {
+      const numberZAP = "55" + numberDDD + numberUser + "@c.us";
+      client.sendMessage(numberZAP, message).then(response => {
+      res.status(200).json({
+        status: true,
+        message: 'Bot zap - Mensagem enviada',
+        response: response
+      });
+      }).catch(err => {
+      res.status(500).json({
+        status: false,
+        message: 'Bot zap - Mensagem não enviada',
+        response: err.text
+      });
+      });
+      console.log("enviou");
+    }
+  
+}else{
+  res.send("Error");
+  console.log("Não enviou");
+}
 });
-
+ 
 // Send media
 app.post('/zap-media', [
   body('number').notEmpty(),
@@ -278,9 +286,9 @@ app.post('/zap-media', [
     });
   }
 });
-
-client.on('message', async msg => {
 var respostas = [];
+client.on('message', async msg => {
+
   if (msg.body !== null && msg.body.toString().toUpperCase() === "OK") {
     respostas.push("OK");
     for (let index = 0; index < mensagens.length; index++) {
@@ -288,7 +296,7 @@ var respostas = [];
     }
     console.log(mensagens);
     const contact = await msg.getContact();
-    msg.reply(`Recebido a confirmação de envio de suprimento para a impressora\n  ${contact.pushname} ", deseja informar data prevista para o envio do Suprimento de impressão?\n S-[Sim]  N-[Não]`);
+    msg.reply(`Recebido a confirmação de envio de suprimento para a impressora\n  ${contact.pushname} ", Você não receberá esse notoficação novamente, apenas de novas impressoras com baixo suprimento`);
     
   } 
   
@@ -313,31 +321,7 @@ var respostas = [];
           },1000 + Math.floor(Math.random() * 1000));
   
   }
-  
-  else if (msg.body !== null && msg.body === "4") {
-    msg.reply("");
-  }
-  
-  else if (msg.body !== null && msg.body === "5") {
-    msg.reply("");
-  }
-  
-  else if (msg.body !== null && msg.body === "7") {
-    msg.reply("");
-  }
-  
-  else if (msg.body !== null && msg.body === "8") {
-    msg.reply("");
-  } 
-  
-  else if (msg.body !== null && msg.body === "9") {
-    msg.reply("");
-  }
-  
-  else if (msg.body !== null && msg.body === "10") {
-    msg.reply("");
-  }
-  
+    
   else if (msg.body !== null && msg.body === "11") {
 
         const contact = await msg.getContact();
@@ -356,26 +340,7 @@ var respostas = [];
           },1000 + Math.floor(Math.random() * 1000));
   
   }
-  
-  else if (msg.body !== null && msg.body === "18") {
-    msg.reply("");
-  }
-  
-  else if (msg.body !== null && msg.body === "19") {
-    msg.reply("");
-  }
 
-  else if (msg.body !== null && msg.body === "6"){
-	  msg.reply("");
-  }
-
-	else if (msg.body !== null && msg.body === "13"){
-		msg.reply("");
-	}
-
-  else if (msg.body !== null && msg.body === "20"){
-		msg.reply("");
-	}
 
 	else if (msg.body !== null || msg.body === "0" || msg.type !== 'ciphertext') {
     
@@ -408,29 +373,26 @@ function filtrar_mensagens(req) {
             if (mensagem.comparar_mensagem(element)) {
               mensagens.push(element); // serial igual e status diferente, adiciona
               adicionou = true;
+              mensagens.push(mensagem);
               console.log("adicionou");
             } else {
               repetido = true;
               console.log("repetido");
             }
-
           }
         });
-        if (!repetido && !adicionou) {
-          mensagens.push(mensagem);
-          console.log("novo");
-        }
+        
       } else {
         mensagens.push(mensagem);
         adicionou = true;
       }
-      var adicionou = false;
-      var repetido = false;
+      console.log(mensagens.length);
+      return adicionou;
+      
     }catch(e){
     console.log(e);
     }
-    console.log(mensagens.length);
-    console.log(mensagens);
+    
 }
 }
 
