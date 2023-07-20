@@ -15,6 +15,7 @@ const app = express();
 const server = http.createServer(app);
 const io =  socketIO(server);
 import { Printer } from './model/Printer.js';
+import { createRequire } from 'node:module';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -26,6 +27,9 @@ const __dirname = path.dirname(__filename);
 
 // app.use(express.json({limit: '50mb'}));
 // app.use(express.urlencoded({limit: '50mb'}));
+const require = createRequire(import.meta.url);
+var mensagens;
+const arquivo_mensagensJson = "mensagens.json"
 
 app.use(express.json());
 app.use(express.urlencoded({
@@ -100,10 +104,17 @@ client.on('disconnected', (reason) => {
 });
 });
 
-var mensagens = [];
+try {
+  mensagens = require('./mensagens.json');
+} catch (err) {
+  mensagens = [];
+  escrever_json(mensagens);
+  console.error("mensagens.json não existe");
+}
+console.log(mensagens);
 
 app.get('/zap-bot-get_messages', async (req, res) => {  
-
+ 
   res.send(mensagens)
   console.log('zap-bot-get XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
 })
@@ -116,12 +127,24 @@ app.post('/zap-bot-printer', async (req, res) =>{
    
 });
 
+function escrever_json(mensagens) {
+ 
+  const fs = require("fs");
+  fs.writeFile(arquivo_mensagensJson, JSON.stringify(mensagens), err => {
+     
+    // Checking for errors
+    if (err) throw err; 
+   
+    console.log(arquivo_mensagensJson + " Salvo com sucesso!"); // Success
+  });
+}
+
 // Send message
 app.post('/zap-bot-message', [
   body('number').notEmpty(),
   body('message').notEmpty(),
 ], async (req, res) => {
-  console.log("mensagem enviada para "  , req.body.number);
+  console.log("mensagem enviada para ", req.body.number);
   const errors = validationResult(req).formatWith(({
     msg
   }) => {
@@ -141,64 +164,16 @@ app.post('/zap-bot-message', [
   const numberUser = number.substr(-8, 8);
   const message = req.body.message;
 
-  if (filtrar_mensagens(req)){
+  filtrar_mensagens(req)
   //var p = Printer(message);
   //console.log(message);
-
-    if (numberDDI !== "55") {
-      const numberZAP = number + "@c.us";
-      client.sendMessage(numberZAP, message).then(response => {
-      res.status(200).json({
-        status: true,
-        message: 'Bot zap - Mensagem enviada',
-        response: response
-      });
-      }).catch(err => {
-      res.status(500).json({
-        status: false,
-        message: 'Bot zap - Mensagem não enviada',
-        response: err.text
-      });
-      });
+  mensagens.forEach(element => {
+    if(element.status === "NAO_LIDA"){
+      enviar_mensagemZap(numberDDI, number, message, res, numberDDD, numberUser)
     }
-    else if (numberDDI === "55" && parseInt(numberDDD) <= 30) {
-      const numberZAP = "55" + numberDDD + "9" + numberUser + "@c.us";
-      client.sendMessage(numberZAP, message).then(response => {
-      res.status(200).json({
-        status: true,
-        message: 'Bot zap - Mensagem enviada',
-        response: response
-      });
-      }).catch(err => {
-      res.status(500).json({
-        status: false,
-        message: 'Bot zap - Mensagem não enviada',
-        response: err.text
-      });
-      });
-    }
-    else if (numberDDI === "55" && parseInt(numberDDD) > 30) {
-      const numberZAP = "55" + numberDDD + numberUser + "@c.us";
-      client.sendMessage(numberZAP, message).then(response => {
-      res.status(200).json({
-        status: true,
-        message: 'Bot zap - Mensagem enviada',
-        response: response
-      });
-      }).catch(err => {
-      res.status(500).json({
-        status: false,
-        message: 'Bot zap - Mensagem não enviada',
-        response: err.text
-      });
-      });
-      console.log("enviou");
-    }
-  
-}else{
-  res.send("Error");
-  console.log("Não enviou");
-}
+    
+  });
+    
 });
  
 // Send media
@@ -293,10 +268,12 @@ client.on('message', async msg => {
     respostas.push("OK");
     for (let index = 0; index < mensagens.length; index++) {
       mensagens[index].status = "LIDA";      
+      escrever_json(mensagens);
     }
     console.log(mensagens);
     const contact = await msg.getContact();
-    msg.reply(`Recebido a confirmação de envio de suprimento para a impressora\n  ${contact.pushname} ", Você não receberá esse notoficação novamente, apenas de novas impressoras com baixo suprimento`);
+    msg.reply(`Recebido a confirmação de envio de suprimento para a impressora\n 
+    ${contact.pushname}, Você não receberá essa mesma notificação novamente, apenas de novas impressoras com baixo suprimento que enventualmente surgirem`);
     
   } 
   
@@ -354,6 +331,63 @@ server.listen(port, function() {
 });
 
 
+function enviar_mensagemZap(numberDDI, number, message, res, numberDDD, numberUser) {
+  if (numberDDI !== "55") {
+    const numberZAP = number + "@c.us";
+    client.sendMessage(numberZAP, message).then(response => {
+      res.status(200).json({
+        status: true,
+        message: 'Bot zap - Mensagem enviada',
+        response: response
+      });
+    }).catch(err => {
+      res.status(500).json({
+        status: false,
+        message: 'Bot zap - Mensagem não enviada',
+        response: err.text
+      });
+    });
+  }
+  else if (numberDDI === "55" && parseInt(numberDDD) <= 30) {
+    const numberZAP = "55" + numberDDD + "9" + numberUser + "@c.us";
+    client.sendMessage(numberZAP, message).then(response => {
+      res.status(200).json({
+        status: true,
+        message: 'Bot zap - Mensagem enviada',
+        response: response
+      });
+    }).catch(err => {
+      res.status(500).json({
+        status: false,
+        message: 'Bot zap - Mensagem não enviada',
+        response: err.text
+      });
+    });
+  }
+  else if (numberDDI === "55" && parseInt(numberDDD) > 30) {
+    const numberZAP = "55" + numberDDD + numberUser + "@c.us";
+    client.sendMessage(numberZAP, message).then(response => {
+      res.status(200).json({
+        status: true,
+        message: 'Bot zap - Mensagem enviada',
+        response: response
+      });
+    }).catch(err => {
+      res.status(500).json({
+        status: false,
+        message: 'Bot zap - Mensagem não enviada',
+        response: err.text
+      });
+    });
+    console.log("enviou");
+
+
+  } else {
+    res.send("Error");
+    console.log("Não enviou");
+  }
+}
+
 function filtrar_mensagens(req) {
   console.log('Filtrar');
   console.log(req.headers);
@@ -366,6 +400,7 @@ function filtrar_mensagens(req) {
       var mensagem = new Mensagem().compor_mensagem(req.body.message);
       var adicionou = false;
       var repetido = false;
+      
       if (mensagens.length > 0) {
 
         mensagens.forEach(element => {
@@ -380,14 +415,17 @@ function filtrar_mensagens(req) {
               console.log("repetido");
             }
           }
+         
         });
         
       } else {
         mensagens.push(mensagem);
         adicionou = true;
+        console.log("adicionou");
       }
       console.log(mensagens.length);
-      return adicionou;
+      escrever_json(mensagens);
+      return adicionou ;
       
     }catch(e){
     console.log(e);
@@ -395,4 +433,3 @@ function filtrar_mensagens(req) {
     
 }
 }
-
